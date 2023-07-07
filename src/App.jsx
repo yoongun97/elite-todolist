@@ -37,24 +37,68 @@ const TodoCard = styled.div`
   justify-content: space-between;
 `;
 
+const BtnContainer = styled.div`
+  display: flex;
+`;
+
+const LikeBtn = styled.div`
+  width: 30px;
+  height: 30px;
+  background-color: transparent;
+  overflow: hidden;
+  margin: 0 5px 0 5px;
+  cursor: pointer;
+`;
+
+const LikeImg = styled.img`
+  width: 30px;
+  height: 30px;
+`;
+
+const LikeCount = styled.span`
+  font-size: 20px;
+`;
+
 function App() {
   const [input, setInput] = useState("");
   const [todos, setTodos] = useState([
-    { id: uuid(), title: "리액트 공부하기", isLike: false },
-    { id: uuid(), title: "아침 운동하기", isLike: false },
+    { id: uuid(), title: "리액트 공부하기", isLike: false, likeCount: 0 },
+    { id: uuid(), title: "아침 운동하기", isLike: false, likeCount: 0 },
   ]);
 
   const addTodosHandler = () => {
-    const newTodo = { title: input, isLike: false };
+    const newTodo = { id: uuid(), title: input, isLike: false, likeCount: 0 };
     const newTodos = [...todos, newTodo];
     setTodos(newTodos);
   };
 
-  const deleteTOdoHandler = (id) => {
+  const deleteTodoHandler = (id) => {
     const updateTodos = todos.filter((todo) => {
       return todo.id !== id;
     });
     setTodos(updateTodos);
+  };
+
+  const likeBtnHandler = (id) => {
+    const likeTodos = todos.map((todo) => {
+      if (todo.id == id) {
+        if (todo.isLike) {
+          return {
+            ...todo,
+            isLike: !todo.isLike,
+            likeCount: todo.likeCount - 1,
+          };
+        } else {
+          return {
+            ...todo,
+            isLike: !todo.isLike,
+            likeCount: todo.likeCount + 1,
+          };
+        }
+      }
+      return todo;
+    });
+    setTodos(likeTodos);
   };
 
   return (
@@ -80,17 +124,33 @@ function App() {
             return (
               <TodoCard key={todo.id}>
                 <span>{todo.title}</span>
-                <div>
+                <BtnContainer>
                   <Button
                     onClick={() => {
-                      deleteTOdoHandler(todo.id);
+                      deleteTodoHandler(todo.id);
                     }}
                   >
                     삭제
                   </Button>
-                  <button>좋아요</button>
-                  <span>1</span>
-                </div>
+                  <LikeBtn
+                    onClick={() => {
+                      likeBtnHandler(todo.id);
+                    }}
+                  >
+                    {todo.isLike ? (
+                      <LikeImg
+                        src="https://cdn-icons-png.flaticon.com/128/2107/2107845.png"
+                        alt="좋아요"
+                      />
+                    ) : (
+                      <LikeImg
+                        src="https://cdn-icons-png.flaticon.com/128/5926/5926215.png"
+                        alt="좋아요"
+                      />
+                    )}
+                  </LikeBtn>
+                  <LikeCount>{todo.likeCount}</LikeCount>
+                </BtnContainer>
               </TodoCard>
             );
           })}
